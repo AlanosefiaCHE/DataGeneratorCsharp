@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Data.SqlClient;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading;
+//https://github.com/ExcelDataReader/ExcelDataReader
+using ExcelDataReader;
 
 namespace DatageneratorCsharp // Note: actual namespace depends on the project name.
 {
@@ -9,8 +13,41 @@ namespace DatageneratorCsharp // Note: actual namespace depends on the project n
         {
             using (SqlConnection conn = new SqlConnection())
             {
+                string heartRateDataPath = "HeartRateSet1.xlsx";
                 conn.ConnectionString = "Server=DESKTOP-QUHRVG6\\MSSQLServer02;Database=APPS;Trusted_Connection=True;TrustServerCertificate=true;";
                 conn.Open();
+
+                Timer timer = new Timer(TimerCallback, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+
+                static void TimerCallback(object state)
+                {
+                    string heartRateDataPath = "HeartRateSet1.xlsx";
+                    string[] rowHeartRateData = ReadRowFromExcel(heartRateDataPath);
+
+                    AddHeartRateToDb(rowHeartRateData);
+
+                }
+                static string[] ReadRowFromExcel(string excelPath)
+                {
+                    string[] empty = new string[0];
+                    using (var stream = File.Open(excelPath, FileMode.Open, FileAccess.Read))
+                    {
+                        using (var reader = ExcelReaderFactory.CreateReader(stream))
+                        {
+                            var dataSet = reader.AsR
+
+                        }
+                    }
+                    return empty;
+                }
+
+                static void AddHeartRateToDb(string[] heartRateData)
+                {
+                   
+                }
+
+
+
                 SqlCommand command = new SqlCommand("SELECT * FROM dbo.Medication", conn);
                 // using the code here...
                using (SqlDataReader reader = command.ExecuteReader()) 
