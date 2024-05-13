@@ -12,32 +12,53 @@ namespace DatageneratorCsharp // Note: actual namespace depends on the project n
     {
         public class HeartRateData
         {
-            public int sensorId;
+            public int SensorId;
             public int HeartRateBPM;
             public DateTime TimeStamp;
+            public string Label;
+            public string Condition;
         }
 
         static void Main(string[] args)
         {
 
-            GetExcelData(0,0);
+            GetExcelData(1,1);
             
 
-             static string GetExcelData(int i, int j)
+             static void GetExcelData(int i, int j)
             {
                 string HeartRateSet1Path = "C:\\Users\\Alan Osefia\\Desktop\\DataGeneratorC#\\DataGeneratorCsharp\\DataGeneratorCsharp\\HeartRateSet1.xlsx";
                 _Application excel = new _Excel.Application();
                 Workbook wb = excel.Workbooks.Open(HeartRateSet1Path);
                 Worksheet ws = wb.Worksheets[1];
 
-                i++;
-                j++;
+                //i++;
+                //j++;
 
-                if (ws.Cells[i,j].Value2 != null)
+                //if (ws.Cells[i,j].Value2 != null)
+                //{
+                //    Console.WriteLine(ws.Cells[i, j].Value2);
+                //}
+                //return "err";
+                int numRows = 122; // Number of rows
+                int numColumns = 4; // Number of columns
+                
+                for (int x = 2; i <= numRows; x++)
                 {
-                    Console.WriteLine(ws.Cells[i, j].Value2);
+                    HeartRateData data = new HeartRateData();
+
+                    // Note: Adjust column indices accordingly
+                    var test = ws.Cells[x, 1].Value2;
+                    data.SensorId = Convert.ToInt32(ws.Cells[x, 1].Value2);
+                    data.HeartRateBPM = Convert.ToInt32(ws.Cells[x, 2].Value2);
+                    data.TimeStamp =DateTime.Now;
+                    data.Label = Convert.ToString(ws.Cells[x, 4].Value2);
+                    data.Condition = Convert.ToString(ws.Cells[x, 5].Value2);
+
+                    // Output to console
+                    Console.WriteLine($"Row {x}: SensorId={data.SensorId}, HeartRateBPM={data.HeartRateBPM}, TimeStamp={data.TimeStamp}, Label={data.Label}, Condition={data.Condition}");
                 }
-                return "err";
+
             }
 
             //static void InsertIntoDb()
@@ -67,7 +88,7 @@ namespace DatageneratorCsharp // Note: actual namespace depends on the project n
             //                using (var reader = ExcelReaderFactory.CreateReader(stream))
             //                {
             //                    var dataSet = reader.AsR
-    
+
             //            }
             //            }
             //            return empty;
@@ -109,8 +130,8 @@ namespace DatageneratorCsharp // Note: actual namespace depends on the project n
 
             //    }
             //}
-           
-            
+
+
         }
     }
 }
