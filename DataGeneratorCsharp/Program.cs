@@ -40,7 +40,7 @@ namespace DatageneratorCsharp // Note: actual namespace depends on the project n
                 //    Console.WriteLine(ws.Cells[i, j].Value2);
                 //}
                 //return "err";
-                int numRows = 122; // Number of rows
+                int numRows = 122-1; // Number of rows
                 int numColumns = 4; // Number of columns
                 
                 for (int x = 2; i <= numRows; x++)
@@ -57,6 +57,7 @@ namespace DatageneratorCsharp // Note: actual namespace depends on the project n
 
                     // Output to console
                     Console.WriteLine($"Row {x}: SensorId={data.SensorId}, HeartRateBPM={data.HeartRateBPM}, TimeStamp={data.TimeStamp}, Label={data.Label}, Condition={data.Condition}");
+                    i++;
                 }
 
             }
