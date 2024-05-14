@@ -1,78 +1,67 @@
-﻿using System;
-using System.Data.SqlClient;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading;
+﻿using System.Data.SqlClient;
 using Microsoft.Office.Interop.Excel;
 using _Excel = Microsoft.Office.Interop.Excel;
-using System.Threading;
 
 namespace DatageneratorCsharp
 {
     internal class Program
     {
-       
         public class HeartRateData // use heartratedata class to make forwarding data to the database more consistent
         {
             public int SensorId;
             public int HeartRateBPM;
             public DateTime TimeStamp;
-            public string Label;
-            public string Condition;
-        }
 
+            public HeartRateData(int sensorId, int heartRateBPM)
+            {
+                SensorId = sensorId;
+                HeartRateBPM = heartRateBPM;
+                TimeStamp = DateTime.Now;
+            }
+        }
         static void Main(string[] args)
         {
+            using SqlConnection conn = new SqlConnection();
+            conn.ConnectionString = "Server=DESKTOP-NSA93TK\\SQLExpress;Database=APPS;Trusted_Connection=True;TrustServerCertificate=true;";
+            conn.Open();
 
-            GetExcelData(1,1);
+            PutHeartRateDataInDb(conn);
+
+        }
+
+        static void PutHeartRateDataInDb(SqlConnection conn)
+        {
+            const int startRow = 2;
+            const int numRows = 122;
+            const int sensorIdIndex = 1;
+            const int heartRateIndex = 2;
+            const int oneMinuteInMs = 60000;
+
+            string HeartRateSet1Path = "C:\\Users\\Gebruiker\\Desktop\\DatageneratorCsharp\\DataGeneratorCsharp\\HeartRateSet1.xlsx"; // This is excel path for my PC.
+            _Application excel = new _Excel.Application();
+            Workbook wb = excel.Workbooks.Open(HeartRateSet1Path); // Workbook.Open opens the excel sheets
+            Worksheet ws = wb.Worksheets[1];// Worksheets selects which worksheet you want to use
             
-
-             static void GetExcelData(int i, int j)
+            for (int currentRow = startRow; currentRow < numRows; currentRow++) // For loop to put all the excel values into the class
             {
-                
-                string HeartRateSet1Path = "C:\\Users\\Alan Osefia\\Desktop\\DataGeneratorC#\\DataGeneratorCsharp\\DataGeneratorCsharp\\HeartRateSet1.xlsx"; // This is excel path for my PC.
-                _Application excel = new _Excel.Application();
-                Workbook wb = excel.Workbooks.Open(HeartRateSet1Path); // Workbook.Open opens the excel sheets
-                Worksheet ws = wb.Worksheets[1];// Worksheets selects which worksheet you want to use
+                HeartRateData heartRateDataRow = new HeartRateData(
+                    sensorId: Convert.ToInt32(ws.Cells[currentRow, sensorIdIndex].Value2),
+                    heartRateBPM: Convert.ToInt32(ws.Cells[currentRow, heartRateIndex].Value2)
+                );
 
+                InsertHeartRateToDb(conn,  heartRateDataRow);
 
-                int numRows = 122-1;
-                int numColumns = 4; 
-                
-                for (int x = 2; i <= numRows; x++) // For loop to put all the excel values into the class
-                {
-                    HeartRateData data = new HeartRateData();
-
-                    var test = ws.Cells[x, 1].Value2;
-                    data.SensorId = Convert.ToInt32(ws.Cells[x, 1].Value2);
-                    data.HeartRateBPM = Convert.ToInt32(ws.Cells[x, 2].Value2);
-                    data.TimeStamp =DateTime.Now;
-                    data.Label = Convert.ToString(ws.Cells[x, 4].Value2);
-                    data.Condition = Convert.ToString(ws.Cells[x, 5].Value2);
-
-                    InsertHeartRateToDb(data);
-                    
-                    Thread.Sleep(60000); // 1 minute timer
-
-                    i++;
-                }
-
+                Thread.Sleep(oneMinuteInMs);
             }
-
-            static void InsertHeartRateToDb(HeartRateData heartRate)
-            {
-                using (SqlConnection conn  = new SqlConnection())
-                {
-                    conn.ConnectionString = "Server=DESKTOP-QUHRVG6\\MSSQLServer02;Database=APPS;Trusted_Connection=True;TrustServerCertificate=true;"; 
-                    conn.Open(); //Opens the connection with the Db
-                    SqlCommand insertCommand = new SqlCommand("INSERT INTO dbo.HeartRateData (SensorId,HeartRateBPM,EnterTime) VALUES (@0, @1,@2)", conn);
-                    insertCommand.Parameters.Add(new SqlParameter("0", heartRate.SensorId));
-                    insertCommand.Parameters.Add(new SqlParameter("1", heartRate.HeartRateBPM));
-                    insertCommand.Parameters.Add(new SqlParameter("2", heartRate.TimeStamp));
-                    Console.WriteLine("Commands executed! Total rows affected are " + insertCommand.ExecuteNonQuery() + $"; sensorId={heartRate.SensorId} heartrate={heartRate.HeartRateBPM}, EnterTime={heartRate.TimeStamp}"); // Adds the data into the db, ands shows the enterd data in the console
-                
-                }
-            }
-         
+        }
+        static void InsertHeartRateToDb(SqlConnection conn, HeartRateData heartRate)
+        {
+            //Opens the connection with the Db
+            SqlCommand insertCommand = new SqlCommand("INSERT INTO dbo.HeartRateData (SensorId,HeartRateBPM,EnterTime) VALUES (@SensorId, @HeartRateBPM,@TimeStamp)", conn);
+            insertCommand.Parameters.Add(new SqlParameter("SensorId", heartRate.SensorId));
+            insertCommand.Parameters.Add(new SqlParameter("HeartRateBPM", heartRate.HeartRateBPM));
+            insertCommand.Parameters.Add(new SqlParameter("TimeStamp", heartRate.TimeStamp));
+            Console.WriteLine("Commands executed! Total rows affected are " + insertCommand.ExecuteNonQuery() + $"; sensorId={heartRate.SensorId} heartrate={heartRate.HeartRateBPM}, EnterTime={heartRate.TimeStamp}"); // Adds the data into the db, ands shows the enterd data in the console
         }
     }
 }
