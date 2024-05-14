@@ -35,14 +35,14 @@ namespace DatageneratorCsharp // Note: actual namespace depends on the project n
                 Worksheet ws = wb.Worksheets[1];
 
      
-                int numRows = 122-1; // Number of rows
-                int numColumns = 4; // Number of columns
+                int numRows = 122-1;
+                int numColumns = 4; 
                 
                 for (int x = 2; i <= numRows; x++)
                 {
                     HeartRateData data = new HeartRateData();
 
-                    // Note: Adjust column indices accordingly
+   
                     var test = ws.Cells[x, 1].Value2;
                     data.SensorId = Convert.ToInt32(ws.Cells[x, 1].Value2);
                     data.HeartRateBPM = Convert.ToInt32(ws.Cells[x, 2].Value2);
