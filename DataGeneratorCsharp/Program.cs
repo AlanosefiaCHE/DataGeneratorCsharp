@@ -8,7 +8,7 @@ using Microsoft.Office.Interop.Excel;
 using _Excel = Microsoft.Office.Interop.Excel;
 using System.Threading;
 
-namespace DatageneratorCsharp // Note: actual namespace depends on the project name.
+namespace DatageneratorCsharp
 {
     internal class Program
     {
