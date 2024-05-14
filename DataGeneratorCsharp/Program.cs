@@ -2,8 +2,6 @@
 using System.Data.SqlClient;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
-//https://github.com/ExcelDataReader/ExcelDataReader
-using ExcelDataReader;
 using Microsoft.Office.Interop.Excel;
 using _Excel = Microsoft.Office.Interop.Excel;
 using System.Threading;
