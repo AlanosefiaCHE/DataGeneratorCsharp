@@ -6,6 +6,8 @@ using System.Threading;
 using ExcelDataReader;
 using Microsoft.Office.Interop.Excel;
 using _Excel = Microsoft.Office.Interop.Excel;
+using System.Threading;
+
 namespace DatageneratorCsharp // Note: actual namespace depends on the project name.
 {
     internal class Program
@@ -32,14 +34,7 @@ namespace DatageneratorCsharp // Note: actual namespace depends on the project n
                 Workbook wb = excel.Workbooks.Open(HeartRateSet1Path);
                 Worksheet ws = wb.Worksheets[1];
 
-                //i++;
-                //j++;
-
-                //if (ws.Cells[i,j].Value2 != null)
-                //{
-                //    Console.WriteLine(ws.Cells[i, j].Value2);
-                //}
-                //return "err";
+     
                 int numRows = 122-1; // Number of rows
                 int numColumns = 4; // Number of columns
                 
@@ -55,84 +50,29 @@ namespace DatageneratorCsharp // Note: actual namespace depends on the project n
                     data.Label = Convert.ToString(ws.Cells[x, 4].Value2);
                     data.Condition = Convert.ToString(ws.Cells[x, 5].Value2);
 
-                    // Output to console
-                    Console.WriteLine($"Row {x}: SensorId={data.SensorId}, HeartRateBPM={data.HeartRateBPM}, TimeStamp={data.TimeStamp}, Label={data.Label}, Condition={data.Condition}");
+                    InsertHeartRateToDb(data);
+                    Thread.Sleep(60000);
+                   
                     i++;
                 }
 
             }
 
-            //static void InsertIntoDb()
-
-            //{
-            //    using (SqlConnection conn = new SqlConnection())
-            //    {
-            //        conn.ConnectionString = "Server=DESKTOP-QUHRVG6\\MSSQLServer02;Database=APPS;Trusted_Connection=True;TrustServerCertificate=true;";
-            //        conn.Open();
-
-            //        string heartRateDataPath = "HeartRateSet1.xlsx";
-            //        Timer timer = new Timer(TimerCallback, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
-
-            //        static void TimerCallback(object state)
-            //        {
-            //            string heartRateDataPath = "HeartRateSet1.xlsx";
-            //            string[] rowHeartRateData = ReadRowFromExcel(heartRateDataPath);
-
-            //            AddHeartRateToDb(rowHeartRateData);
-
-            //        }
-            //        static string[] ReadRowFromExcel(string excelPath)
-            //        {
-            //            string[] empty = new string[0];
-            //            using (var stream = File.Open(excelPath, FileMode.Open, FileAccess.Read))
-            //            {
-            //                using (var reader = ExcelReaderFactory.CreateReader(stream))
-            //                {
-            //                    var dataSet = reader.AsR
-
-            //            }
-            //            }
-            //            return empty;
-            //        }
-
-            //        static void AddHeartRateToDb(string[] heartRateData)
-            //        {
-
-            //        }
-
-
-
-            //        SqlCommand command = new SqlCommand("SELECT * FROM dbo.Medication", conn);
-            //        // using the code here...
-            //        using (SqlDataReader reader = command.ExecuteReader())
-            //        {
-            //            Console.WriteLine("Id\tName\t\tAmountMg");
-            //            while (reader.Read())
-            //            {
-            //                Console.WriteLine(String.Format("{0} \t | {1} \t | {2}",
-            //                 // call the objects from their index
-            //                 reader[0], reader[1], reader[2]));
-            //            }
-            //        }
-            //        Console.WriteLine("Data displayed! Now press enter to move to the next section!");
-            //        Console.ReadLine();
-            //        Console.Clear();
-
-            //        Console.WriteLine("INSERT INTO command");
-
-            //        SqlCommand insertCommand = new SqlCommand("INSERT INTO dbo.Medication (Name, AmountMg) VALUES (@0, @1)", conn);
-            //        insertCommand.Parameters.Add(new SqlParameter("0", "MDMA"));
-            //        insertCommand.Parameters.Add(new SqlParameter("1", "200"));
-
-            //        Console.WriteLine("Commands executed! Total rows affected are " + insertCommand.ExecuteNonQuery());
-            //        Console.WriteLine("Done! Press enter to move to the next step");
-            //        Console.ReadLine();
-            //        Console.Clear();
-
-            //    }
-            //}
-
-
+            static void InsertHeartRateToDb(HeartRateData heartRate)
+            {
+                using (SqlConnection conn  = new SqlConnection())
+                {
+                    conn.ConnectionString = "Server=DESKTOP-QUHRVG6\\MSSQLServer02;Database=APPS;Trusted_Connection=True;TrustServerCertificate=true;";
+                    conn.Open();
+                    SqlCommand insertCommand = new SqlCommand("INSERT INTO dbo.HeartRateData (SensorId,HeartRateBPM,EnterTime) VALUES (@0, @1,@2)", conn);
+                    insertCommand.Parameters.Add(new SqlParameter("0", heartRate.SensorId));
+                    insertCommand.Parameters.Add(new SqlParameter("1", heartRate.HeartRateBPM));
+                    insertCommand.Parameters.Add(new SqlParameter("2", heartRate.TimeStamp));
+                    Console.WriteLine("Commands executed! Total rows affected are " + insertCommand.ExecuteNonQuery() + $"; sensorId={heartRate.SensorId} heartrate={heartRate.HeartRateBPM}, EnterTime={heartRate.TimeStamp}");
+                
+                }
+            }
+         
         }
     }
 }
