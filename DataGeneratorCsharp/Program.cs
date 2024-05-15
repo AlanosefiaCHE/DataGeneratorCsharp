@@ -22,7 +22,8 @@ namespace DatageneratorCsharp
         static void Main(string[] args)
         {
             using SqlConnection conn = new SqlConnection();
-            conn.ConnectionString = "Server=DESKTOP-NSA93TK\\SQLExpress;Database=APPS;Trusted_Connection=True;TrustServerCertificate=true;";
+            //conn.ConnectionString = "Server=DESKTOP-NSA93TK\\SQLExpress;Database=APPS;Trusted_Connection=True;TrustServerCertificate=true;";
+            conn.ConnectionString = "Server=DESKTOP-QUHRVG6\\MSSQLServer02;Database=APPS;Trusted_Connection=True;TrustServerCertificate=true;";
             conn.Open();
 
             PutHeartRateDataInDb(conn);
@@ -32,12 +33,13 @@ namespace DatageneratorCsharp
         static void PutHeartRateDataInDb(SqlConnection conn)
         {
             const int startRow = 2;
-            const int numRows = 122;
+            const int numRows = 5761;
             const int sensorIdIndex = 1;
             const int heartRateIndex = 2;
             const int oneMinuteInMs = 60000;
 
-            string HeartRateSet1Path = "C:\\Users\\Gebruiker\\Desktop\\DatageneratorCsharp\\DataGeneratorCsharp\\HeartRateSet1.xlsx"; // This is excel path for my PC.
+           // string HeartRateSet1Path = "C:\\Users\\Gebruiker\\Desktop\\DatageneratorCsharp\\DataGeneratorCsharp\\HeartRateSet1.xlsx"; // This is excel path for my PC.
+            string HeartRateSet1Path = "C:\\Users\\Alan Osefia\\Desktop\\DataGeneratorC#\\DataGeneratorCsharp\\DataGeneratorCsharp\\HeartRateSet1.xlsx"; // This is excel path for my PC.
             _Application excel = new _Excel.Application();
             Workbook wb = excel.Workbooks.Open(HeartRateSet1Path); // Workbook.Open opens the excel sheets
             Worksheet ws = wb.Worksheets[1];// Worksheets selects which worksheet you want to use
