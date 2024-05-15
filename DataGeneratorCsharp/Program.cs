@@ -22,8 +22,8 @@ namespace DatageneratorCsharp
         static void Main(string[] args)
         {
             using SqlConnection conn = new SqlConnection();
-            //conn.ConnectionString = "Server=DESKTOP-NSA93TK\\SQLExpress;Database=APPS;Trusted_Connection=True;TrustServerCertificate=true;";
-            conn.ConnectionString = "Server=DESKTOP-QUHRVG6\\MSSQLServer02;Database=APPS;Trusted_Connection=True;TrustServerCertificate=true;";
+            conn.ConnectionString = "Server=DESKTOP-NSA93TK\\SQLExpress;Database=APPS;Trusted_Connection=True;TrustServerCertificate=true;"; // laptop
+            //conn.ConnectionString = "Server=DESKTOP-QUHRVG6\\MSSQLServer02;Database=APPS;Trusted_Connection=True;TrustServerCertificate=true;"; //computer
             conn.Open();
 
             PutHeartRateDataInDb(conn);
@@ -38,12 +38,12 @@ namespace DatageneratorCsharp
             const int heartRateIndex = 2;
             const int oneMinuteInMs = 60000;
 
-           // string HeartRateSet1Path = "C:\\Users\\Gebruiker\\Desktop\\DatageneratorCsharp\\DataGeneratorCsharp\\HeartRateSet1.xlsx"; // This is excel path for my PC.
-            string HeartRateSet1Path = "C:\\Users\\Alan Osefia\\Desktop\\DataGeneratorC#\\DataGeneratorCsharp\\DataGeneratorCsharp\\HeartRateSet1.xlsx"; // This is excel path for my PC.
+           string HeartRateSet1Path = "C:\\Users\\Gebruiker\\Desktop\\DatageneratorCsharp\\DataGeneratorCsharp\\HeartRateSet1.xlsx"; // This is excel path for my laptop.
+           //string HeartRateSet1Path = "C:\\Users\\Alan Osefia\\Desktop\\DataGeneratorC#\\DataGeneratorCsharp\\DataGeneratorCsharp\\HeartRateSet1.xlsx"; // This is excel path for my computer.
             _Application excel = new _Excel.Application();
             Workbook wb = excel.Workbooks.Open(HeartRateSet1Path); // Workbook.Open opens the excel sheets
             Worksheet ws = wb.Worksheets[1];// Worksheets selects which worksheet you want to use
-            Worksheet ws2 = wb.Worksheets[2];
+            //Worksheet ws2 = wb.Worksheets[2];
 
             for (int currentRow = startRow; currentRow < numRows; currentRow++) // For loop to put all the excel values into the class
             {
@@ -51,14 +51,15 @@ namespace DatageneratorCsharp
                     sensorId: Convert.ToInt32(ws.Cells[currentRow, sensorIdIndex].Value2),
                     heartRateBPM: Convert.ToInt32(ws.Cells[currentRow, heartRateIndex].Value2)
                 );
-                HeartRateData heartRateDataRow2 = new HeartRateData(
-                    sensorId: Convert.ToInt32(ws2.Cells[currentRow, sensorIdIndex].Value2),
-                    heartRateBPM: Convert.ToInt32(ws2.Cells[currentRow, heartRateIndex].Value2)
-                );
+                //Second sensor
+                //HeartRateData heartRateDataRow2 = new HeartRateData(
+                //    sensorId: Convert.ToInt32(ws2.Cells[currentRow, sensorIdIndex].Value2),
+                //    heartRateBPM: Convert.ToInt32(ws2.Cells[currentRow, heartRateIndex].Value2)
+                //);
                 InsertHeartRateToDb(conn,  heartRateDataRow);
-                InsertHeartRateToDb(conn,  heartRateDataRow2);
+               // InsertHeartRateToDb(conn,  heartRateDataRow2);
 
-                Thread.Sleep(oneMinuteInMs);
+                Thread.Sleep(2000);
             }
         }
         static void InsertHeartRateToDb(SqlConnection conn, HeartRateData heartRate)
