@@ -43,15 +43,20 @@ namespace DatageneratorCsharp
             _Application excel = new _Excel.Application();
             Workbook wb = excel.Workbooks.Open(HeartRateSet1Path); // Workbook.Open opens the excel sheets
             Worksheet ws = wb.Worksheets[1];// Worksheets selects which worksheet you want to use
-            
+            Worksheet ws2 = wb.Worksheets[2];
+
             for (int currentRow = startRow; currentRow < numRows; currentRow++) // For loop to put all the excel values into the class
             {
                 HeartRateData heartRateDataRow = new HeartRateData(
                     sensorId: Convert.ToInt32(ws.Cells[currentRow, sensorIdIndex].Value2),
                     heartRateBPM: Convert.ToInt32(ws.Cells[currentRow, heartRateIndex].Value2)
                 );
-
+                HeartRateData heartRateDataRow2 = new HeartRateData(
+                    sensorId: Convert.ToInt32(ws2.Cells[currentRow, sensorIdIndex].Value2),
+                    heartRateBPM: Convert.ToInt32(ws2.Cells[currentRow, heartRateIndex].Value2)
+                );
                 InsertHeartRateToDb(conn,  heartRateDataRow);
+                InsertHeartRateToDb(conn,  heartRateDataRow2);
 
                 Thread.Sleep(oneMinuteInMs);
             }
