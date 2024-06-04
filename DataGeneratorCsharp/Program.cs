@@ -13,12 +13,17 @@ namespace DatageneratorCsharp
             public int? SensorId;
             public int? HeartRateBPM;
             public DateTime? TimeStamp;
+            public bool IsProcessed;
+            public bool IsFaulty;
 
             public HeartRateData(int sensorId, int heartRateBPM, DateTime? timeStamp)
             {
                 SensorId = sensorId;
                 HeartRateBPM = heartRateBPM;
                 TimeStamp = timeStamp;
+                IsProcessed = false;
+                IsFaulty = false;
+
             }
         }
         static void Main(string[] args)
@@ -72,7 +77,7 @@ namespace DatageneratorCsharp
                 InsertHeartRateToDb(conn,  heartRateDataRow2);
                 InsertHeartRateToDb(conn,  heartRateDataRow3);
 
-                Thread.Sleep(2000);
+                Thread.Sleep(10000);
             }
         }
         static int? ConvertStringToIntOrNull(dynamic? InputValue)
@@ -98,10 +103,12 @@ namespace DatageneratorCsharp
         static void InsertHeartRateToDb(SqlConnection conn, HeartRateData heartRate)
         {
             //Opens the connection with the Db
-            SqlCommand insertCommand = new SqlCommand("INSERT INTO dbo.HeartRateData (SensorId,HeartRateBPM,EnterTime) VALUES (@SensorId, @HeartRateBPM,@TimeStamp)", conn);
-            insertCommand.Parameters.Add(new SqlParameter("SensorId", heartRate.SensorId));
+            SqlCommand insertCommand = new SqlCommand("INSERT INTO dbo.HeartRateData (HeartRateSensorId,HeartRateBPM,EnterTime,IsProcessed,IsFaulty) VALUES (@HeartRateSensorId, @HeartRateBPM,@TimeStamp, @IsProcessed,@IsFaulty)", conn);
+            insertCommand.Parameters.Add(new SqlParameter("HeartRateSensorId", heartRate.SensorId));
             insertCommand.Parameters.Add(new SqlParameter("HeartRateBPM", heartRate.HeartRateBPM));
             insertCommand.Parameters.Add(new SqlParameter("TimeStamp", heartRate.TimeStamp.HasValue ? heartRate.TimeStamp.Value : DBNull.Value ));
+            insertCommand.Parameters.Add(new SqlParameter("HeartRateBPM", heartRate.IsProcessed));
+            insertCommand.Parameters.Add(new SqlParameter("HeartRateBPM", heartRate.IsFaulty));
             Console.WriteLine("Commands executed! Total rows affected are " + insertCommand.ExecuteNonQuery() + $"; sensorId={heartRate.SensorId} heartrate={heartRate.HeartRateBPM}, EnterTime={heartRate.TimeStamp}"); // Adds the data into the db, ands shows the enterd data in the console
         }
     }
